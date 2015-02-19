@@ -1,0 +1,5 @@
+language: bash
+before_script:
+  - npm install -g dox
+script:
+  - diff -w <(./generate-docs) README.md

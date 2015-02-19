@@ -1,0 +1,6 @@
+{
+  "name": "browser-extension-toggle-button",
+  "main": "browser-extension-toggle-button.js",
+  "keywords": ["browser", "extension", "toggle", "state", "active", "button", "chrome", "safari"],
+  "ignore": ["**/.*", "*.md", "generate-docs"]
+}

@@ -12,13 +12,12 @@
    * To activate, either send an activation message or click the browser
    * extension's button.
    *
-   * Parameters:
+   * Parameter: options (Object):
    *
-   * - options (Object): Options which may contain:
-   *     - icon (Object): Maps "active" square icon widths to image paths
-   *     - inactiveIcon (Object): Maps "inactive" square icon widths to image paths (defaults to extension default)
-   *     - title (String): "Active" icon title
-   *     - inactiveTitle (String): "Inactive" icon title (defaults to extension default)
+   * - icon (Object): Maps "active" square icon widths to image paths
+   * - inactiveIcon (Object): Maps "inactive" square icon widths to image paths (defaults to extension default)
+   * - title (String): "Active" icon title
+   * - inactiveTitle (String): "Inactive" icon title (defaults to extension default)
    *
    * @param {Object} options
    */
@@ -75,20 +74,20 @@
     this.handleActivationMessage = function(message) {
       this.setActive(!!message.active);
     };
-
-    /**
-     * Begin listening for events:
-     *
-     * - Mouse clicks on extension button
-     * - Extension messages to control active status (format: `{ active: Boolean }`)
-     * - Page loads (and other tab updates) to reactivate extension in tabs when active
-     */
-    this.listen = function() {
-      chrome.browserAction.onClicked.addListener(this.toggleActive.bind(this));
-      chrome.runtime.onMessage.addListener(this.handleActivationMessage.bind(this));
-      chrome.tabs.onUpdated.addListener(this.reactivateTabIfNeeded.bind(this));
-    };
   }
+
+  /**
+   * Begin listening for events:
+   *
+   * - Mouse clicks on extension button
+   * - Extension messages to control active status (format: `{ active: Boolean }`)
+   * - Page loads (and other tab updates) to reactivate extension in tabs when active
+   */
+  BrowserExtensionToggleButton.prototype.listen = function() {
+    chrome.browserAction.onClicked.addListener(this.toggleActive.bind(this));
+    chrome.runtime.onMessage.addListener(this.handleActivationMessage.bind(this));
+    chrome.tabs.onUpdated.addListener(this.reactivateTabIfNeeded.bind(this));
+  };
 
   window.BrowserExtensionToggleButton = BrowserExtensionToggleButton;
 

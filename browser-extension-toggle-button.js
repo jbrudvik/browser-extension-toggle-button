@@ -1,6 +1,4 @@
 
-/* global chrome:false */
-
 (function(window, undefined) {
 
   /**

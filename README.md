@@ -1,1 +1,2 @@
-# browser-extension-toggle-button
+# Browser Extension Toggle Button
+

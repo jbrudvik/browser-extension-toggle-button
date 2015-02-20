@@ -22,6 +22,8 @@
    * @param {Object} options
    */
   function BrowserExtensionToggleButton(options) {
+    options = options || {};
+
     this.active = false;
 
     if (options.icon) {

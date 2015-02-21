@@ -26,25 +26,29 @@
 
     this.active = false;
 
-    if (options.icon) {
-      this.icon = {
-        true: options.icon,
-        false: options.inactiveIcon || chrome.runtime.getManifest().browser_action.default_icon
-      };
-    }
+    if (typeof chrome !== 'undefined') {
+      if (options.icon) {
+        this.icon = {
+          true: options.icon,
+          false: options.inactiveIcon || chrome.runtime.getManifest().browser_action.default_icon
+        };
+      }
 
-    if (options.title) {
-      this.title = {
-        true: options.title,
-        false: options.inactiveTitle || chrome.runtime.getManifest().browser_action.default_title
-      };
+      if (options.title) {
+        this.title = {
+          true: options.title,
+          false: options.inactiveTitle || chrome.runtime.getManifest().browser_action.default_title
+        };
+      }
     }
 
     this.setActive = function(active, callback) {
       this.active = (active !== undefined) ? active : true;
 
-      if (this.icon) chrome.browserAction.setIcon({ path: this.icon[active] });
-      if (this.title) chrome.browserAction.setTitle({ title: this.title[active] });
+      if (typeof chrome !== 'undefined') {
+        if (this.icon) chrome.browserAction.setIcon({ path: this.icon[active] });
+        if (this.title) chrome.browserAction.setTitle({ title: this.title[active] });
+      }
 
       this.setTabsActive(this.active, callback);
     };
@@ -60,17 +64,21 @@
     };
 
     this.setTabActive = function(tabId, active) {
-      chrome.tabs.sendMessage(tabId, { active: active });
+      if (typeof chrome !== 'undefined') {
+        chrome.tabs.sendMessage(tabId, { active: active });
+      }
     };
 
     this.setTabsActive = function(active, callback) {
-      var self = this;
-      chrome.tabs.query({}, function(tabs) {
-        for (var i = 0; i < tabs.length; i++) {
-          self.setTabActive(tabs[i].id, active);
-        }
-        if (callback) callback();
-      });
+      if (typeof chrome !== 'undefined') {
+        var self = this;
+        chrome.tabs.query({}, function(tabs) {
+          for (var i = 0; i < tabs.length; i++) {
+            self.setTabActive(tabs[i].id, active);
+          }
+          if (callback) callback();
+        });
+      }
     };
 
     this.handleActivationMessage = function(message) {
@@ -86,9 +94,11 @@
    * - Page loads (and other tab updates) to reactivate extension in tabs when active
    */
   BrowserExtensionToggleButton.prototype.listen = function() {
-    chrome.browserAction.onClicked.addListener(this.toggleActive.bind(this));
-    chrome.runtime.onMessage.addListener(this.handleActivationMessage.bind(this));
-    chrome.tabs.onUpdated.addListener(this.reactivateTabIfNeeded.bind(this));
+    if (typeof chrome !== 'undefined') {
+      chrome.browserAction.onClicked.addListener(this.toggleActive.bind(this));
+      chrome.runtime.onMessage.addListener(this.handleActivationMessage.bind(this));
+      chrome.tabs.onUpdated.addListener(this.reactivateTabIfNeeded.bind(this));
+    }
   };
 
   window.BrowserExtensionToggleButton = BrowserExtensionToggleButton;

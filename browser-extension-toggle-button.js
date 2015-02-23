@@ -14,8 +14,8 @@
    *
    * Parameter: options (Object):
    *
-   * - icon (Object): Maps "active" square icon widths to image paths
-   * - inactiveIcon (Object): Maps "inactive" square icon widths to image paths (defaults to extension default)
+   * - icon (Object): Chrome: Maps "active" square icon widths to image paths, Safari: "active" image path (retina support: '@2x' version in same directory)
+   * - inactiveIcon (Object): Chrome: Maps "inactive" square icon widths to image paths (defaults to extension default), Safari: "inactive" image path (retina support: '@2x' version in same directory)
    * - title (String): "Active" icon title
    * - inactiveTitle (String): "Inactive" icon title (defaults to extension default)
    *
@@ -45,6 +45,19 @@
           false: options.inactiveTitle || chrome.runtime.getManifest().browser_action.default_title
         };
       }
+    } else if (this.isSafari) {
+      if (options.icon) {
+        this.icon = {
+          true: options.icon,
+          false: options.inactiveIcon
+        };
+      }
+      if (options.title) {
+        this.title = {
+          true: options.title,
+          false: options.inactiveTitle
+        };
+      }
     }
 
     this.setActive = function(active, callback) {
@@ -53,6 +66,9 @@
       if (this.isChrome) {
         if (this.icon) chrome.browserAction.setIcon({ path: this.icon[active] });
         if (this.title) chrome.browserAction.setTitle({ title: this.title[active] });
+      } else if (this.isSafari) {
+        if (this.icon) safari.extension.toolbarItems[0].image = safari.extension.baseURI + this.icon[active];
+        if (this.title) safari.extension.toolbarItems[0].toolTip = this.title[active];
       }
 
       this.setTabsActive(this.active, callback);

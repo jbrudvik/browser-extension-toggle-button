@@ -18,8 +18,8 @@
   
   Parameter: options (Object):
   
-  - icon (Object): Maps "active" square icon widths to image paths
-  - inactiveIcon (Object): Maps "inactive" square icon widths to image paths (defaults to extension default)
+  - icon (Object): Chrome: Maps "active" square icon widths to image paths, Safari: "active" image path (retina support: '@2x' version in same directory)
+  - inactiveIcon (Object): Chrome: Maps "inactive" square icon widths to image paths (defaults to extension default), Safari: "inactive" image path (retina support: '@2x' version in same directory)
   - title (String): "Active" icon title
   - inactiveTitle (String): "Inactive" icon title (defaults to extension default)
 

@@ -24,9 +24,14 @@
   function BrowserExtensionToggleButton(options) {
     options = options || {};
 
+    // Browser context
+    this.isChrome = typeof chrome !== 'undefined';
+    this.isSafari = typeof safari !== 'undefined';
+
+    // Inactive by default
     this.active = false;
 
-    if (typeof chrome !== 'undefined') {
+    if (this.isChrome) {
       if (options.icon) {
         this.icon = {
           true: options.icon,
@@ -45,7 +50,7 @@
     this.setActive = function(active, callback) {
       this.active = (active !== undefined) ? active : true;
 
-      if (typeof chrome !== 'undefined') {
+      if (this.isChrome) {
         if (this.icon) chrome.browserAction.setIcon({ path: this.icon[active] });
         if (this.title) chrome.browserAction.setTitle({ title: this.title[active] });
       }
@@ -64,13 +69,15 @@
     };
 
     this.setTabActive = function(tabId, active) {
-      if (typeof chrome !== 'undefined') {
+      if (this.isChrome) {
         chrome.tabs.sendMessage(tabId, { active: active });
+      } else if (this.isSafari) {
+
       }
     };
 
     this.setTabsActive = function(active, callback) {
-      if (typeof chrome !== 'undefined') {
+      if (this.isChrome) {
         var self = this;
         chrome.tabs.query({}, function(tabs) {
           for (var i = 0; i < tabs.length; i++) {
@@ -78,7 +85,7 @@
           }
           if (callback) callback();
         });
-      } else if (typeof safari !== 'undefined') {
+      } else if (this.isSafari) {
         var windows = safari.application.browserWindows;
         for (var i = 0; i < windows.length; i++) {
           var tabs = windows[i].tabs;
@@ -105,11 +112,11 @@
    * - Page loads (and other tab updates) to reactivate extension in tabs when active
    */
   BrowserExtensionToggleButton.prototype.listen = function() {
-    if (typeof chrome !== 'undefined') {
+    if (this.isChrome) {
       chrome.browserAction.onClicked.addListener(this.toggleActive.bind(this));
       chrome.runtime.onMessage.addListener(this.handleActivationMessage.bind(this));
       chrome.tabs.onUpdated.addListener(this.reactivateTabIfNeeded.bind(this));
-    } else if (typeof safari !== 'undefined') {
+    } else if (this.isSafari) {
       safari.application.addEventListener('command', this.toggleActive.bind(this), false);
     }
   };

@@ -62,17 +62,19 @@
       this.setActive(!this.active);
     };
 
-    this.reactivateTabIfNeeded = function(tabId) {
+    this.reactivateTabIfNeeded = function(tab) {
       if (this.active) {
-        this.setTabActive(tabId, true);
+        this.setTabActive(tab, true);
       }
     };
 
-    this.setTabActive = function(tabId, active) {
+    this.setTabActive = function(tab, active) {
       if (this.isChrome) {
-        chrome.tabs.sendMessage(tabId, { active: active });
+        chrome.tabs.sendMessage(tab, { active: active });
       } else if (this.isSafari) {
-
+        if (tab && tab.page && tab.page.dispatchMessage) {
+          tab.page.dispatchMessage('active', active);
+        }
       }
     };
 
@@ -91,11 +93,10 @@
           var tabs = windows[i].tabs;
           for (var j = 0; j < tabs.length; j++) {
             var tab = tabs[j];
-            if (tab && tab.page && tab.page.dispatchMessage) {
-              tab.page.dispatchMessage('toggle');
-            }
+            this.setTabActive(tab, active);
           }
         }
+        if (callback) callback();
       }
     };
 

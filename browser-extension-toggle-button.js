@@ -78,6 +78,17 @@
           }
           if (callback) callback();
         });
+      } else if (typeof safari !== 'undefined') {
+        var windows = safari.application.browserWindows;
+        for (var i = 0; i < windows.length; i++) {
+          var tabs = windows[i].tabs;
+          for (var j = 0; j < tabs.length; j++) {
+            var tab = tabs[j];
+            if (tab && tab.page && tab.page.dispatchMessage) {
+              tab.page.dispatchMessage('toggle');
+            }
+          }
+        }
       }
     };
 
@@ -98,6 +109,8 @@
       chrome.browserAction.onClicked.addListener(this.toggleActive.bind(this));
       chrome.runtime.onMessage.addListener(this.handleActivationMessage.bind(this));
       chrome.tabs.onUpdated.addListener(this.reactivateTabIfNeeded.bind(this));
+    } else if (typeof safari !== 'undefined') {
+      safari.application.addEventListener('command', this.toggleActive.bind(this), false);
     }
   };
 

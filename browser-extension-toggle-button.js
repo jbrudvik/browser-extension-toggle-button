@@ -48,14 +48,14 @@
     } else if (this.isSafari) {
       if (options.icon) {
         this.icon = {
-          true: options.icon,
-          false: options.inactiveIcon
+          true: safari.extension.baseURI + options.icon,
+          false: options.inactiveIcon ? (safari.extension.baseURI + options.inactiveIcon) : safari.extension.toolbarItems[0].image
         };
       }
       if (options.title) {
         this.title = {
           true: options.title,
-          false: options.inactiveTitle
+          false: options.inactiveTitle || safari.extension.toolbarItems[0].toolTip
         };
       }
     }
@@ -67,7 +67,7 @@
         if (this.icon) chrome.browserAction.setIcon({ path: this.icon[active] });
         if (this.title) chrome.browserAction.setTitle({ title: this.title[active] });
       } else if (this.isSafari) {
-        if (this.icon) safari.extension.toolbarItems[0].image = safari.extension.baseURI + this.icon[active];
+        if (this.icon) safari.extension.toolbarItems[0].image = this.icon[active];
         if (this.title) safari.extension.toolbarItems[0].toolTip = this.title[active];
       }
 

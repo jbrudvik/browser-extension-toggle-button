@@ -117,7 +117,15 @@
     };
 
     this.handleActivationMessage = function(message) {
-      this.setActive(!!message.active);
+      var active;
+      if (this.isChrome) {
+        active = !!message.active;
+      } else if (this.isSafari) {
+        active = message.message;
+      }
+      if (active !== undefined) {
+        this.setActive(active);
+      }
     };
   }
 
@@ -135,6 +143,7 @@
       chrome.tabs.onUpdated.addListener(this.reactivateTabIfNeeded.bind(this));
     } else if (this.isSafari) {
       safari.application.addEventListener('command', this.toggleActive.bind(this), false);
+      safari.application.addEventListener('message', this.handleActivationMessage.bind(this), false);
     }
   };
 

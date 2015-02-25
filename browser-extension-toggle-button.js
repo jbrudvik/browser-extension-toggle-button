@@ -78,13 +78,21 @@
       this.setActive(!this.active);
     };
 
-    this.reactivateTabIfNeeded = function(tab) {
-      if (this.active) {
-        this.setTabActive(tab, true);
+    this.reactivateTabIfNeeded = function(target) {
+      var tab;
+      if (this.isChrome) {
+        tab = target;
+      } else if (this.isSafari) {
+        tab = target.target;
+      }
+      if (tab !== undefined && this.active) {
+        this.setTabActive(tab);
       }
     };
 
     this.setTabActive = function(tab, active) {
+      if (active === undefined) active = true;
+
       if (this.isChrome) {
         chrome.tabs.sendMessage(tab, { active: active });
       } else if (this.isSafari) {
@@ -144,6 +152,7 @@
     } else if (this.isSafari) {
       safari.application.addEventListener('command', this.toggleActive.bind(this), false);
       safari.application.addEventListener('message', this.handleActivationMessage.bind(this), false);
+      safari.application.addEventListener('navigate', this.reactivateTabIfNeeded.bind(this), false);
     }
   };
 

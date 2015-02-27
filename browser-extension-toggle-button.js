@@ -67,8 +67,14 @@
         if (this.icon) chrome.browserAction.setIcon({ path: this.icon[active] });
         if (this.title) chrome.browserAction.setTitle({ title: this.title[active] });
       } else if (this.isSafari) {
-        if (this.icon) safari.extension.toolbarItems[0].image = this.icon[active];
-        if (this.title) safari.extension.toolbarItems[0].toolTip = this.title[active];
+        var icon = this.icon ? this.icon[active] : undefined;
+        var title = this.title ? this.title[active] : undefined;
+
+        for (var i = 0; i < safari.extension.toolbarItems.length; i++) {
+          var toolbarItem = safari.extension.toolbarItems[i];
+          if (icon) toolbarItem.image = icon;
+          if (title) toolbarItem.toolTip = title;
+        }
       }
 
       this.setTabsActive(this.active, callback);

@@ -141,6 +141,8 @@
         this.setActive(active);
       }
     };
+
+    this.setActive(this.active);
   }
 
   /**

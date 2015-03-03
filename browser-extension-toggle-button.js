@@ -12,8 +12,6 @@
    * To activate, either send an activation message or click the browser
    * extension's button.
    *
-   * Browser support: Chrome, Safari
-   *
    * Parameter: options (Object):
    *
    * - icon (Object): Chrome: Maps "active" square icon widths to image paths, Safari: "active" image path (retina support: '@2x' version in same directory)

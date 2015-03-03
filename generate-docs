@@ -6,4 +6,4 @@ shopt -s dotglob
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 pushd "${dir}" > /dev/null
-cat header.md <(echo) <(find . -maxdepth 1 -name '*.js' -print0 | xargs -0 cat | dox -aS | sed '/^\// d') <(echo) footer.md 2> /dev/null
+cat header.md <(echo) <(find . -maxdepth 1 -name '*.js' -print0 | xargs -0 cat | dox -aS | sed '/^\// d' | sed 's/^  \([^ ]\)/\1/' | sed 's/^      \([^ ]\)/    \1/') <(echo) footer.md 2> /dev/null

@@ -109,6 +109,8 @@
     };
 
     this.setTabsActive = function(active, callback) {
+      this.active = (active !== undefined) ? active : true;
+
       if (this.isChrome) {
         var self = this;
         chrome.tabs.query({}, function(tabs) {

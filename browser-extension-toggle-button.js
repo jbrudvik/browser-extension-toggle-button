@@ -46,42 +46,35 @@
         };
       }
     } else if (this.isSafari) {
+      var toolbarItem = safari.extension.toolbarItems[0];
       if (options.icon) {
         this.icon = {
           true: safari.extension.baseURI + options.icon,
-          false: options.inactiveIcon ? (safari.extension.baseURI + options.inactiveIcon) : safari.extension.toolbarItems[0].image
+          false: options.inactiveIcon ? (safari.extension.baseURI + options.inactiveIcon) : (toolbarItem ? toolbarItem.image : undefined)
         };
       }
       if (options.title) {
         this.title = {
           true: options.title,
-          false: options.inactiveTitle || safari.extension.toolbarItems[0].toolTip
+          false: options.inactiveTitle || (toolbarItem ? toolbarItem.toolTip : undefined)
         };
       }
     }
 
     this.setActive = function(active, callback) {
       this.active = (active !== undefined) ? active : true;
-
-      if (this.isChrome) {
-        if (this.icon) chrome.browserAction.setIcon({ path: this.icon[active] });
-        if (this.title) chrome.browserAction.setTitle({ title: this.title[active] });
-      } else if (this.isSafari) {
-        var icon = this.icon ? this.icon[active] : undefined;
-        var title = this.title ? this.title[active] : undefined;
-
-        for (var i = 0; i < safari.extension.toolbarItems.length; i++) {
-          var toolbarItem = safari.extension.toolbarItems[i];
-          if (icon) toolbarItem.image = icon;
-          if (title) toolbarItem.toolTip = title;
-        }
-      }
-
+      this.setButtonActive(this.active);
       this.setTabsActive(this.active, callback);
     };
 
     this.toggleActive = function() {
       this.setActive(!this.active);
+    };
+
+    this.reactivateButtonIfNeeded = function() {
+      if (this.active) {
+        this.setButtonActive(this.active);
+      }
     };
 
     this.reactivateTabIfNeeded = function(target) {
@@ -93,6 +86,27 @@
       }
       if (tab !== undefined && this.active) {
         this.setTabActive(tab);
+      }
+    };
+
+    this.setButtonActive = function(active) {
+      this.active = (active !== undefined) ? active : true;
+
+      if (this.isChrome) {
+        if (this.icon) chrome.browserAction.setIcon({ path: this.icon[active] });
+        if (this.title) chrome.browserAction.setTitle({ title: this.title[active] });
+      } else if (this.isSafari) {
+        if (active && !this.icon[false]) this.icon[false] = safari.extension.toolbarItems[0].image;
+        if (active && !this.title[false]) this.title[false] = safari.extension.toolbarItems[0].toolTip;
+
+        var icon = this.icon ? this.icon[active] : undefined;
+        var title = this.title ? this.title[active] : undefined;
+
+        for (var i = 0; i < safari.extension.toolbarItems.length; i++) {
+          var toolbarItem = safari.extension.toolbarItems[i];
+          if (icon) toolbarItem.image = icon;
+          if (title) toolbarItem.toolTip = title;
+        }
       }
     };
 
@@ -163,6 +177,7 @@
       safari.application.addEventListener('command', this.toggleActive.bind(this), false);
       safari.application.addEventListener('message', this.handleActivationMessage.bind(this), false);
       safari.application.addEventListener('navigate', this.reactivateTabIfNeeded.bind(this), false);
+      safari.application.addEventListener('open', this.reactivateButtonIfNeeded.bind(this), true);
     }
   };
 

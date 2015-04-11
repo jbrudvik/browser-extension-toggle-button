@@ -1,3 +1,4 @@
+/* global chrome:false, safari:false */
 
 (function(window, undefined) {
 
